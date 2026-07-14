@@ -1,10 +1,10 @@
-# Framework Layer Detection Reference
+# Framework Layer & Architecture Detection Reference
 
-Use this reference to identify how different frameworks organize files and folders into **Presentation**, **Logic**, and **Data** layers.
+Use this reference to identify how different frameworks and architectural patterns organize files and folders.
 
 ---
 
-## 1. Detection Matrix
+## 1. Detection Matrix (Layered / MVC)
 
 | Framework / Tech Stack | Presentation Layer | Logic Layer | Data Layer |
 |---|---|---|---|
@@ -42,3 +42,58 @@ If the project uses an undocumented custom architecture, apply these semantic de
 *   Connection setup and configuration files for databases (e.g. `prisma.schema`, `knexfile.js`, `database.config`).
 *   Files implementing the repository pattern (names ending in `Repository`, `DAO`, `Schema`).
 *   Code responsible for wrapping external third-party API payloads into internal objects (API wrappers/SDKs).
+
+---
+
+## 3. Clean / Hexagonal Architecture Detection
+
+For projects utilizing Domain-Driven Design (DDD) or Ports-and-Adapters architectures:
+
+### A. Core / Domain Layer
+*   **What it is**: Pure business rules and entity models. It must have **zero dependencies** on databases, frameworks, or web APIs.
+*   **Folder names**: `domain/`, `core/`, `entities/`, `model/domain/`.
+*   **Indicators**: Classes containing only logic, getters/setters, and validations. No external HTTP or database framework imports.
+
+### B. Ports Layer (Interfaces)
+*   **What it is**: Interfaces defining how the core communicates with the outside world (incoming or outgoing).
+*   **Folder names**: `ports/`, `usecases/`, `interfaces/`.
+*   **Indicators**: Class or interface definitions containing method signatures but no implementations (e.g. `UserRepository`, `PaymentService` interface).
+
+### C. Adapters Layer (Implementations)
+*   **What it is**: Implementations that connect ports to actual databases, web frameworks, and APIs.
+*   **Folder names**: `adapters/`, `infrastructure/`, `repositories/`, `controllers/`.
+*   **Indicators**: Controllers implementing routing, and repository classes implementing DB queries (e.g. `SqlUserRepository` inheriting from `UserRepository` port).
+
+---
+
+## 4. Event-Driven Architecture Detection
+
+For projects built around async message brokers (RabbitMQ, Kafka, SQS, Redis PubSub):
+
+### A. Event Publishers / Producers
+*   **What it is**: Components that construct events and publish them to a broker.
+*   **Folder names**: `producers/`, `publishers/`, `emitters/`, `events/`.
+*   **Indicators**: Methods calling `.publish()`, `.emit()`, `.send()`, or broker SDK client methods.
+
+### B. Event Channels / Brokers
+*   **What it is**: Message routing, queues, topic names, and broker setup configurations.
+*   **Folder names**: `config/queue/`, `topics/`, `queues/`, `broker/`.
+*   **Indicators**: YAML/JSON configuration mappings for queues, exchange configurations, or broker connection definitions.
+
+### C. Event Handlers / Consumers
+*   **What it is**: Code triggered by incoming events to execute tasks.
+*   **Folder names**: `consumers/`, `handlers/`, `subscribers/`, `listeners/`.
+*   **Indicators**: Functions marked with listener annotations (e.g., `@RabbitListener`, `@KafkaListener`, `.on('message')`) that process data payloads and trigger services.
+
+---
+
+## 5. Monorepos & Microservices Directory Management
+
+When encountering project layouts containing multiple distinct applications:
+
+*   **Detection**: Look for a root containing `packages/`, `apps/`, or `services/` alongside a root-level workspace configuration (e.g. `pnpm-workspace.yaml`, `lerna.json`, `nx.json`).
+*   **Handling Strategy**:
+    1.  **Do not force a single 3-layer model on the root directory**.
+    2.  Identify individual service/app directories (e.g. `apps/api`, `apps/web`).
+    3.  Classify each subdirectory independently using the rules above.
+    4.  Document the relationship between packages in `project-overview.md` and use `layer-integration.md` to show how these apps interact (e.g., via HTTP REST, gRPC, or events).
