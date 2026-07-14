@@ -88,11 +88,22 @@ The skill directs the agent through seven execution phases:
 
 ---
 
+## Examples
+
+You can see examples of generated outputs inside the `examples/` directory:
+- [Sample Project Overview](file:///c:/Users/user/Nata/Project/Skill/codebase-onboarder/examples/sample-project-overview.md): Clean documentation of a Next.js / Prisma codebase.
+- [Sample Layer Integration Map](file:///c:/Users/user/Nata/Project/Skill/codebase-onboarder/examples/sample-layer-integration.md): Inter-layer sequence and flow diagrams using Mermaid.
+
+---
+
 ## Usage
 
-This skill activates when you prompt the agent with phrases such as:
+Once this skill is installed globally or locally in your project, the AI agent will automatically listen for your commands. 
+
+To start the analysis, open a chat session with your agent in the target codebase and enter one of these commands:
 - "pahami project ini" / "analyze this codebase"
 - "buatkan diagram arsitektur project ini" / "diagram the architecture"
 - "bagaimana flow sistem di repo ini" / "explain this codebase structure"
 
-The generated `.md` and `.mmd` files can be read by both developers and agents in subsequent sessions, preventing the need to re-scan the codebase in the future.
+The agent will progressively scan the codebase and save the output inside `.agents/skills/codebase-onboarder/`. In future chat sessions, the agent will read these cached reports first instead of re-scanning, saving your API tokens.
+
